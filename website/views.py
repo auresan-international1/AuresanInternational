@@ -42,8 +42,9 @@ def callback_request(request):
                         email='',
                         phone=cb.phone_number,
                         company='',
-                        status='new',
+                        status='pending',
                         priority='medium',
+                        source='website',
                         created_by=fallback_user,
                     )
             except Exception:

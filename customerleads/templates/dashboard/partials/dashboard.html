@@ -198,87 +198,107 @@
     </div>
 </div>
 
-<!-- Pending Website Leads Section -->
-<div class="table-container-card" style="margin-bottom: 2rem;">
+<!-- Unified Leads Table -->
+<div class="table-container-card">
     <div style="border-bottom: 1px solid var(--border-color); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
         <h5 style="margin:0; font-size: 1.05rem; font-weight: 600; color: var(--text-main);">
-            <i class="fas fa-clock me-2" style="color: #f59e0b;"></i> Pending Website Leads
+            <i class="fas fa-list me-2" style="color: var(--primary-blue); margin-right: 0.5rem;"></i> Leads
         </h5>
-        <span class="badge" style="background: #fef3c7; color: #92400e; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">
-            Total: {{ pending_website_leads|length }}
-        </span>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span class="badge" style="background: #f1f5f9; color: #475569; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">
+                Total: {{ leads|length }}
+            </span>
+            <a href="{% url 'lead_create' %}" style="background: var(--primary-blue); color: #fff; font-size: 0.82rem; padding: 0.3rem 0.85rem; border-radius: 6px; text-decoration: none; font-weight: 600;">
+                <i class="fas fa-plus"></i> Add Lead
+            </a>
+        </div>
     </div>
     <div style="overflow-x: auto;">
         <table class="custom-dashboard-table">
             <thead>
                 <tr>
                     <th>Order ID</th>
+                    <th>Name</th>
                     <th>Phone</th>
                     <th>Product</th>
-                    <th>Qty</th>
+                    <th>Status</th>
+                    <th>Priority</th>
                     <th>Added</th>
-                    <th>Call Outcome</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for lead in pending_website_leads %}
-                <tr id="pending-lead-row-{{ lead.id }}">
-                    <td><strong>{{ lead.order_id }}</strong></td>
-                    <td style="font-family: monospace; font-weight: 600; color: #1e293b;">{{ lead.phone }}</td>
+                {% for lead in leads %}
+                <tr id="lead-row-{{ lead.id }}">
+                    <td style="font-family: monospace; font-size: 0.8rem; color: #64748b;">{{ lead.order_id|default:lead.id }}</td>
+                    <td><strong>{{ lead.name|default:"—" }}</strong></td>
+                    <td style="font-family: monospace; font-weight: 600; color: #1e293b;">{{ lead.phone|default:"—" }}</td>
                     <td style="color: var(--text-muted);">{{ lead.company|default:"—" }}</td>
-                    <td>{{ lead.quantity|default:"—" }}</td>
+                    <td>
+                        <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 6px;
+                            {% if lead.status == 'new' or lead.status == 'pending' %}background: #eff6ff; color: #1d4ed8;
+                            {% elif lead.status == 'contacted' %}background: #ecfdf5; color: #047857;
+                            {% elif lead.status == 'confirmed' %}background: #f0fdf4; color: #15803d;
+                            {% elif lead.status == 'failed' or lead.status == 'lost' %}background: #fff1f2; color: #b91c1c;
+                            {% elif lead.status == 'unreachable' or lead.status == 'not_answered' %}background: #fff7ed; color: #c2410c;
+                            {% else %}background: #f8fafc; color: #475569;{% endif %}">
+                            <span style="width: 6px; height: 6px; border-radius: 50%; background:
+                                {% if lead.status == 'new' or lead.status == 'pending' %}#3b82f6
+                                {% elif lead.status == 'contacted' %}#10b981
+                                {% elif lead.status == 'confirmed' %}#22c55e
+                                {% elif lead.status == 'failed' or lead.status == 'lost' %}#ef4444
+                                {% elif lead.status == 'unreachable' or lead.status == 'not_answered' %}#f97316
+                                {% else %}#64748b{% endif %};"></span>
+                            {{ lead.status|capfirst|default:"—" }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if lead.priority %}
+                        <span style="padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;
+                            {% if lead.priority == 'high' %}background: #fee2e2; color: #991b1b;
+                            {% elif lead.priority == 'medium' %}background: #fef3c7; color: #92400e;
+                            {% else %}background: #f1f5f9; color: #475569;{% endif %}">
+                            {{ lead.priority|capfirst }}
+                        </span>
+                        {% else %}—{% endif %}
+                    </td>
                     <td style="color: var(--text-muted); font-size: 0.85rem;">{{ lead.created_at|naturaltime }}</td>
                     <td>
                         <div style="display: flex; gap: 0.25rem; flex-wrap: wrap; align-items: center;">
-                            <form 
-                                hx-post="{% url 'update_lead_call_outcome' lead_id=lead.id %}" 
-                                hx-target="#pending-lead-row-{{ lead.id }}" 
-                                hx-swap="outerHTML"
-                            >
+                            <form hx-post="{% url 'update_lead_call_outcome' lead_id=lead.id %}" hx-target="#lead-row-{{ lead.id }}" hx-swap="outerHTML">
                                 {% csrf_token %}
                                 <input type="hidden" name="call_outcome" value="unreachable">
                                 <input type="hidden" name="call_outcome_notes" value="Unreachable">
-                                <button type="submit" class="btn btn-sm btn-warning" title="Unreachable">
-                                    <i class="fas fa-phone-slash"></i>
-                                </button>
+                                <button type="submit" class="btn btn-sm btn-warning" title="Unreachable"><i class="fas fa-phone-slash"></i></button>
                             </form>
                             <button type="button" class="btn btn-sm btn-success" title="Confirmed"
                                 hx-get="{% url 'get_confirm_order_form' lead_id=lead.id %}"
-                                hx-target="#pending-lead-row-{{ lead.id }}"
+                                hx-target="#lead-row-{{ lead.id }}"
                                 hx-swap="outerHTML">
                                 <i class="fas fa-check"></i>
                             </button>
-                            <form 
-                                hx-post="{% url 'update_lead_call_outcome' lead_id=lead.id %}" 
-                                hx-target="#pending-lead-row-{{ lead.id }}" 
-                                hx-swap="outerHTML"
-                            >
+                            <form hx-post="{% url 'update_lead_call_outcome' lead_id=lead.id %}" hx-target="#lead-row-{{ lead.id }}" hx-swap="outerHTML">
                                 {% csrf_token %}
                                 <input type="hidden" name="call_outcome" value="failed">
                                 <input type="hidden" name="call_outcome_notes" value="Failed">
-                                <button type="submit" class="btn btn-sm btn-danger" title="Failed">
-                                    <i class="fas fa-times"></i>
-                                </button>
+                                <button type="submit" class="btn btn-sm btn-danger" title="Failed"><i class="fas fa-times"></i></button>
                             </form>
-                            <form 
-                                hx-post="{% url 'update_lead_call_outcome' lead_id=lead.id %}" 
-                                hx-target="#pending-lead-row-{{ lead.id }}" 
-                                hx-swap="outerHTML"
-                            >
+                            <form hx-post="{% url 'update_lead_call_outcome' lead_id=lead.id %}" hx-target="#lead-row-{{ lead.id }}" hx-swap="outerHTML">
                                 {% csrf_token %}
                                 <input type="hidden" name="call_outcome" value="not_answered">
                                 <input type="hidden" name="call_outcome_notes" value="Not Answered">
-                                <button type="submit" class="btn btn-sm btn-secondary" title="Not Answered">
-                                    <i class="fas fa-phone-volume"></i>
-                                </button>
+                                <button type="submit" class="btn btn-sm btn-secondary" title="Not Answered"><i class="fas fa-phone-volume"></i></button>
                             </form>
+                            <a href="{% url 'lead_detail' pk=lead.id %}" class="btn btn-sm btn-outline-primary" title="View"><i class="fas fa-eye"></i></a>
                         </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 2rem 1.5rem; color: var(--text-muted);">
-                        <span style="font-weight: 500; display: block; color: var(--text-main);">No pending website leads.</span>
+                    <td colspan="8" style="text-align: center; padding: 4rem 1.5rem; color: var(--text-muted);">
+                        <i class="fas fa-folder-open" style="font-size: 2rem; display: block; margin-bottom: 0.75rem; color: #94a3b8; opacity: 0.6;"></i>
+                        <span style="font-weight: 500; display: block; color: var(--text-main);">No leads found in the system!</span>
+                        <span style="font-size: 0.85rem;">When you import or create leads, they will display here.</span>
                     </td>
                 </tr>
                 {% endfor %}
@@ -287,64 +307,4 @@
     </div>
 </div>
 
-<!-- Master Leads Registry Table Container -->
-<div class="table-container-card">
-    <div style="border-bottom: 1px solid var(--border-color); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
-        <h5 style="margin:0; font-size: 1.05rem; font-weight: 600; color: var(--text-main);">
-            <i class="fas fa-database me-2" style="color: var(--primary-blue); margin-right: 0.5rem;"></i> Master Leads Table
-        </h5>
-        <span class="badge" style="background: #f1f5f9; color: #475569; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">
-            Total Records: {{ leads.count|default:0 }}
-        </span>
-    </div>
-    <div style="overflow-x: auto;">
-        <table class="custom-dashboard-table">
-            <thead>
-                <tr>
-                    <th>orderId</th>
-                    <th>Name</th>
-                    <th>Phone No.</th>
-                    <th>Status</th>
-                    <th>Priority</th>
-                    <th>Added</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for lead in leads %}
-                <tr>
-                    <td style="font-family: monospace; font-weight: 600; color: #1e293b;">{{ lead.order_id }}</td>
-                    <td><strong>{{ lead.name }}</strong></td>
-                    <td style="font-family: monospace; font-weight: 600; color: #1e293b;">{{ lead.phone }}</td>
-                    <td>
-                        <!-- Dynamic Status Pill Badges -->
-                        <span style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 6px;
-                            {% if lead.status == 'new' %}background: #eff6ff; color: #1d4ed8;
-                            {% elif lead.status == 'contacted' %}background: #ecfdf5; color: #047857;
-                            {% elif lead.status == 'failed' or lead.status == 'invalid_number' %}background: #fff1f2; color: #b91c1c;
-                            {% else %}background: #f8fafc; color: #475569;{% endif %}">
-                            <span style="width: 6px; height: 6px; border-radius: 50%; 
-                                background: {% if lead.status == 'new' %}#3b82f6{% elif lead.status == 'contacted' %}#10b981{% elif lead.status == 'failed' or lead.status == 'invalid_number' %}#ef4444{% else %}#64748b{% endif %};"></span>
-                            {{ lead.get_status_display }}
-                        </span>
-                    </td>
-                    <td>
-                        <span style="padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; 
-                            background: {% if lead.priority == 'high' %}#fee2e2; color: #991b1b{% elif lead.priority == 'medium' %}#fef3c7; color: #92400e{% else %}#f1f5f9; color: #475569{% endif %};">
-                            {{ lead.get_priority_display }}
-                        </span>
-                    </td>
-                    <td style="color: var(--text-muted); font-size: 0.85rem;">{{ lead.created_at|naturaltime }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 4rem 1.5rem; color: var(--text-muted);">
-                        <i class="fas fa-folder-open" style="font-size: 2rem; display: block; margin-bottom: 0.75rem; color: #94a3b8; opacity: 0.6;"></i>
-                        <span style="font-weight: 500; display: block; color: var(--text-main);">No leads found in the system!</span>
-                        <span style="font-size: 0.85rem;">When you import or create leads, they will securely display right here.</span>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+

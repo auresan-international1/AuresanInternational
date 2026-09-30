@@ -13,23 +13,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-^oj5w)d!96q5wz2!xb#o%hd#m=o4!!sp3s5_h$wl84zz71j#li'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ["auresaninternational.com", "localhost", "127.0.0.1","www.auresaninternational.com"]
-
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,7 +49,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'auresancrm.urls'
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'dashboard_redirect'  # This should match your URL name
+LOGIN_REDIRECT_URL = 'dashboard_redirect'
 LOGOUT_REDIRECT_URL = 'login'
 
 AUTH_USER_MODEL = 'customerleads.CustomUser'
@@ -86,20 +76,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'auresancrm.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'auresancrm'),
-        'USER': os.getenv('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
-        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
-        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+FIREBASE_SERVICE_ACCOUNT_PATH = os.getenv('FIREBASE_SERVICE_ACCOUNT_PATH', str(BASE_DIR / 'serviceAccountKey.json'))
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
@@ -108,13 +92,8 @@ EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = "chipcodetechnologies@gmail.com"
 EMAIL_HOST_PASSWORD = "yqve ckoow sktv krwi"
-# EMAIL_HOST_PASSWORD = "yqveckoowsktvkrwi"
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -131,10 +110,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -143,12 +118,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-# Security: Expire session when browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -156,13 +126,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Africa's Talking Configuration
 AFRICASTALKING_USERNAME = 'leadarena'
 AFRICASTALKING_API_KEY = 'atsk_eb1cf9d84b3f1e410d6ffb2d2f6d6881f02faeb322a186c83e8cc9e0f633416157cdd933'
-AFRICASTALKING_VIRTUAL_NUMBER = '+256323200925' # Your AT sandbox number
-
+AFRICASTALKING_VIRTUAL_NUMBER = '+256323200925'

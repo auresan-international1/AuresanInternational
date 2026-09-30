@@ -238,6 +238,67 @@
         .action-btn { flex: 1; padding: 10px; border: none; border-radius: 6px; color: white; cursor: pointer; }
         .btn-call { background: var(--success); }
         .btn-hangup { background: #ef4444; }
+
+        .pending-leads-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+            margin-top: 1.5rem;
+            overflow: hidden;
+        }
+
+        .pending-leads-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pending-leads-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .pending-leads-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .pending-leads-table th,
+        .pending-leads-table td {
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .pending-leads-table th {
+            background: #f8fafc;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-light);
+        }
+
+        .pending-leads-table tbody tr:hover {
+            background: #f8fbff;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 0.35rem 0.65rem;
+            border-radius: 999px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
     </style>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -428,6 +489,45 @@ function resumeSystem() {
 
             <!-- Initial content (dashboard) -->
             {% include content_template|default:'dashboard/partials/dashboard.html' %}
+
+            {% if pending_website_leads %}
+            <div class="pending-leads-card">
+                <div class="pending-leads-header">
+                    <h3>Pending Website Leads</h3>
+                    <span class="status-pill">{{ pending_website_leads|length }} waiting</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="pending-leads-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Email</th>
+                                <th>Source</th>
+                                <th>Submitted</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lead in pending_website_leads %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ lead.full_name|default:lead.name|default:lead.first_name|default:'-' }}</td>
+                                <td>{{ lead.phone|default:lead.mobile|default:'-' }}</td>
+                                <td>{{ lead.email|default:'-' }}</td>
+                                <td>{{ lead.source|default:'Website' }}</td>
+                                <td>{{ lead.created_at|date:'d M Y, H:i'|default:lead.created|date:'d M Y, H:i'|default:'-' }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: #6b7280; padding: 1.25rem;">No pending website leads available.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
         </main>
     </div>
 

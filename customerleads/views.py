@@ -1026,7 +1026,7 @@ def operator_dashboard(request):
     bonuses = f"{qualified_count * 5.50:.2f} UGX."
     average_check = f"UGX{avg_check_val:,.2f}"
 
-    pending_website_leads = Lead.objects.filter(status='pending', source='website').order_by('-created_at')[:50]
+    pending_website_leads = Lead.objects.filter(status__in=['pending', 'new'], source='website').order_by('-created_at')[:50]
 
     context = {
         'leads': all_leads_table,
