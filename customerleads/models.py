@@ -729,8 +729,10 @@ class FirestoreModel:
 
     def __init__(self, data=None, doc_id=None):
         self._data = data or {}
-        self._doc_id = doc_id or data.get('id') if isinstance(data, dict) else None
-        if doc_id and 'id' not in self._data:
+        # _doc_id is always the Firestore document ID (used for URL routing / save / delete)
+        self._doc_id = doc_id or self._data.get('_doc_id') or (data.get('id') if isinstance(data, dict) else None)
+        # Preserve the document's own 'id' field (e.g. 'DA-004'); only fall back to doc_id if absent
+        if 'id' not in self._data and doc_id:
             self._data['id'] = int(doc_id) if str(doc_id).isdigit() else doc_id
 
     def __getattr__(self, name):
@@ -748,10 +750,12 @@ class FirestoreModel:
 
     @property
     def pk(self):
-        return self._data.get('id') or self._doc_id
+        """Returns the Firestore document ID used for URL routing and DB operations."""
+        return self._doc_id or self._data.get('_doc_id') or self._data.get('id')
 
     @property
     def id(self):
+        """Returns the document's own 'id' field (e.g. 'DA-004'), falling back to Firestore doc ID."""
         return self._data.get('id') or self._doc_id
 
     def to_dict(self):

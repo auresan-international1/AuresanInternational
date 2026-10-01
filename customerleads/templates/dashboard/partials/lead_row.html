@@ -1,6 +1,6 @@
 {% load humanize %}
 <tr id="pending-lead-row-{{ lead.id }}">
-    <td><strong>{{ lead.order_id }}</strong></td>
+    <td><strong>{{ lead.id }}</strong></td>
     <td style="font-family: monospace; font-weight: 600; color: #1e293b;">{{ lead.phone }}</td>
     <td style="color: var(--text-muted);">{{ lead.company|default:"—" }}</td>
     <td>{{ lead.quantity|default:"—" }}</td>

@@ -13,7 +13,11 @@ def convert_to_dict(data, doc_id=None):
     """Convert Firestore document to a dict suitable for attribute access."""
     result = dict(data)
     if doc_id:
-        result['id'] = int(doc_id) if str(doc_id).isdigit() else doc_id
+        # Always store the Firestore document ID separately so URLs/PKs work
+        result['_doc_id'] = doc_id
+        # Only set 'id' from the Firestore doc ID if the document has no own 'id' field
+        if 'id' not in result:
+            result['id'] = int(doc_id) if str(doc_id).isdigit() else doc_id
     return result
 
 
@@ -142,6 +146,7 @@ class FirestoreObject:
         self._data = data or {}
         self._doc_id = doc_id
         self._collection = collection
+        # Only set 'id' from Firestore doc ID if the document has no own 'id' field
         if 'id' not in self._data:
             self._data['id'] = int(doc_id) if doc_id and str(doc_id).isdigit() else doc_id
 
@@ -163,7 +168,8 @@ class FirestoreObject:
 
     @property
     def pk(self):
-        return self._data.get('id')
+        """Returns the Firestore document ID used for URL routing and DB operations."""
+        return self._doc_id or self._data.get('_doc_id') or self._data.get('id')
 
     def to_dict(self):
         return self._data.copy()

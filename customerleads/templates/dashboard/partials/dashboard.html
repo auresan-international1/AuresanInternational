@@ -230,7 +230,7 @@
             <tbody>
                 {% for lead in leads %}
                 <tr id="lead-row-{{ lead.id }}">
-                    <td style="font-family: monospace; font-size: 0.8rem; color: #64748b;">{{ lead.order_id|default:lead.id }}</td>
+                    <td style="font-family: monospace; font-size: 0.8rem; color: #64748b;">{{ lead.id }}</td>
                     <td><strong>{{ lead.name|default:"—" }}</strong></td>
                     <td style="font-family: monospace; font-weight: 600; color: #1e293b;">{{ lead.phone|default:"—" }}</td>
                     <td style="color: var(--text-muted);">{{ lead.company|default:"—" }}</td>

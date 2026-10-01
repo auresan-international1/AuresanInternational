@@ -490,44 +490,8 @@ function resumeSystem() {
             <!-- Initial content (dashboard) -->
             {% include content_template|default:'dashboard/partials/dashboard.html' %}
 
-            {% if pending_website_leads %}
-            <div class="pending-leads-card">
-                <div class="pending-leads-header">
-                    <h3>Pending Website Leads</h3>
-                    <span class="status-pill">{{ pending_website_leads|length }} waiting</span>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table class="pending-leads-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Phone</th>
-                                <th>Email</th>
-                                <th>Source</th>
-                                <th>Submitted</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for lead in pending_website_leads %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ lead.full_name|default:lead.name|default:lead.first_name|default:'-' }}</td>
-                                <td>{{ lead.phone|default:lead.mobile|default:'-' }}</td>
-                                <td>{{ lead.email|default:'-' }}</td>
-                                <td>{{ lead.source|default:'Website' }}</td>
-                                <td>{{ lead.created_at|date:'d M Y, H:i'|default:lead.created|date:'d M Y, H:i'|default:'-' }}</td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6" style="text-align: center; color: #6b7280; padding: 1.25rem;">No pending website leads available.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {% endif %}
+
+
         </main>
     </div>
 
